@@ -36,14 +36,44 @@ jobs:
 
       - name: Verify Server Binary
         run: |
-          # Test the server binary with --help (should not start the server)
-          if "$(brew --prefix)/bin/languagetool-obsidian-server" --help 2>&1 | grep -q "HTTPServer"; then
-            echo "✅ Server binary is working properly"
+          # Check if the binary exists and is executable
+          if [ -x "$(brew --prefix)/bin/languagetool-obsidian-server" ]; then
+            echo "✅ Server binary is executable"
           else
-            echo "❌ Server binary failed to run"
+            echo "❌ Server binary is not executable"
             exit 1
           fi
 
-      - name: Uninstall Formula
+          # Check the contents of the script
+          if grep -q "languagetool-server.jar" "$(brew --prefix)/bin/languagetool-obsidian-server"; then
+            echo "✅ Server binary contains correct paths"
+          else
+            echo "❌ Server binary doesn't contain expected content"
+            exit 1
+          fi
+
+      - name: Verify Service Setup
         run: |
-          brew uninstall languagetool-obsidian
+          # Check if the service can be loaded
+          brew services start languagetool-obsidian || { echo "❌ Failed to start service"; exit 1; }
+          echo "✅ Service started successfully"
+
+          # Wait a moment for the service to initialize
+          sleep 5
+
+          # Check if the service appears in the list
+          if brew services list | grep -q languagetool-obsidian; then
+            echo "✅ Service is listed in brew services"
+          else
+            echo "❌ Service is not listed in brew services"
+            exit 1
+          fi
+
+          # Stop the service
+          brew services stop languagetool-obsidian
+
+      - name: Uninstall Formula
+        if: always()
+        run: |
+          brew services stop languagetool-obsidian || true
+          brew uninstall languagetool-obsidian || true

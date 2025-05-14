@@ -13,14 +13,18 @@ on:
 jobs:
   test-formula:
     runs-on: macos-latest
+
     steps:
+      # Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Set up Homebrew
       - name: Set up Homebrew
         run: |
           brew update
 
+      # Install Formula
       - name: Install Formula
         run: |
           # Install the formula
@@ -34,9 +38,10 @@ jobs:
             exit 1
           fi
 
+      # Verify Server Binary
       - name: Verify Server Binary
         run: |
-          # Check if the binary exists and is executable
+          # Ensure the server binary is executable
           if [ -x "$(brew --prefix)/bin/languagetool-obsidian-server" ]; then
             echo "✅ Server binary is executable"
           else
@@ -52,16 +57,17 @@ jobs:
             exit 1
           fi
 
+      # Verify Service Setup
       - name: Verify Service Setup
         run: |
-          # Check if the service can be loaded
+          # Start the service
           brew services start languagetool-obsidian || { echo "❌ Failed to start service"; exit 1; }
           echo "✅ Service started successfully"
 
           # Wait a moment for the service to initialize
           sleep 5
 
-          # Check if the service appears in the list
+          # Check if the service appears in brew services
           if brew services list | grep -q languagetool-obsidian; then
             echo "✅ Service is listed in brew services"
           else
@@ -69,11 +75,22 @@ jobs:
             exit 1
           fi
 
+          # Test server response
+          curl -s http://localhost:8081/v2/check || { echo "❌ LanguageTool server is not responding"; exit 1; }
+
           # Stop the service
           brew services stop languagetool-obsidian
 
+      # Uninstall Formula
       - name: Uninstall Formula
         if: always()
         run: |
+          # Stop the service and uninstall the formula
           brew services stop languagetool-obsidian || true
           brew uninstall languagetool-obsidian || true
+
+          # Clean up residual files
+          rm -rf ~/Library/LaunchAgents/org.languagetool.server.plist
+          rm -rf ~/.languagetool
+
+          echo "✅ Formula uninstalled and cleanup complete."

@@ -4,12 +4,12 @@ A Homebrew tap providing LanguageTool optimized for Obsidian integration. This t
 
 ## Features
 
-- ✅ **Privacy-Focused**: All grammar and spell checking happens locally on your machine
-- ✅ **No Usage Limits**: Unlimited checking without subscription fees
-- ✅ **Automatic Startup**: Server starts automatically when you log in
-- ✅ **Obsidian Integration**: Works seamlessly with the Obsidian LanguageTool plugin
-- ✅ **CORS Support**: Properly configured CORS headers for browser access
-- ✅ **Version Options**: Support for both stable releases and development snapshots
+- ✅ **Privacy-Focused**: All grammar and spell checking happens locally on your machine.
+- ✅ **No Usage Limits**: Unlimited checking without subscription fees.
+- ✅ **Automatic Startup**: Server starts automatically when you log in.
+- ✅ **Obsidian Integration**: Works seamlessly with the Obsidian LanguageTool plugin.
+- ✅ **CORS Support**: Properly configured CORS headers for browser access.
+- ✅ **Version Options**: Support for both stable releases and development snapshots.
 
 ## Installation
 
@@ -36,10 +36,10 @@ brew install languagetool-obsidian --with-snapshot
 
 After installation:
 
-1. Install the LanguageTool plugin from Obsidian's Community Plugins
+1. Install the **LanguageTool** plugin from **Obsidian's Community Plugins**.
 2. Configure the plugin with:
-   - Server URL: `http://localhost:8081`
-   - Ensure "Auto check on file open" and "Auto check on text change" are enabled
+   - **Server URL**: `http://localhost:8081`
+   - Ensure **"Auto check on file open"** and **"Auto check on text change"** are enabled.
 
 ![Obsidian Configuration](https://user-images.githubusercontent.com/YOUR_USER_ID/obsidian-config.png)
 
@@ -144,6 +144,14 @@ brew uninstall languagetool-obsidian
 brew untap mrlesmithjr/languagetool
 ```
 
+### Optional: Skip Confirmation and Validation Checks
+
+For automated environments (e.g., CI/CD), you can use the `--force` flag to skip confirmation and validation checks:
+
+```bash
+./uninstall-languagetool.sh --force
+```
+
 ## Comparison with Other Methods
 
 | Feature              | This Formula           | Official Homebrew Formula | Manual Installation |
@@ -156,8 +164,8 @@ brew untap mrlesmithjr/languagetool
 
 ## Credits
 
-- [LanguageTool](https://languagetool.org/) - The open-source proofreading software
-- [Obsidian](https://obsidian.md/) - The knowledge base that works on local Markdown files
+- [LanguageTool](https://languagetool.org/) - The open-source proofreading software.
+- [Obsidian](https://obsidian.md/) - The knowledge base that works on local Markdown files.
 
 ## License
 

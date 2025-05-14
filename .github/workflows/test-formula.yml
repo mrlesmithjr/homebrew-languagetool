@@ -1,0 +1,75 @@
+name: Test Formula
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Formula/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "Formula/**"
+
+jobs:
+  test-formula:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Homebrew
+        run: |
+          brew update
+
+      - name: Test Formula Installation
+        run: |
+          brew install --build-from-source ./Formula/languagetool-obsidian.rb
+
+      - name: Check if server starts
+        run: |
+          # Start the server in the background
+          $(brew --prefix)/bin/languagetool-obsidian-server &
+          SERVER_PID=$!
+
+          # Wait for server to start
+          sleep 5
+
+          # Test connectivity
+          if curl -s http://localhost:8081 > /dev/null; then
+            echo "✅ Server is running correctly"
+          else
+            echo "❌ Server failed to start properly"
+            exit 1
+          fi
+
+          # Kill the server
+          kill $SERVER_PID
+
+      - name: Test Service Setup
+        run: |
+          # Start the service
+          brew services start languagetool-obsidian
+          sleep 5
+
+          # Check if it's running
+          if brew services list | grep languagetool-obsidian | grep started; then
+            echo "✅ Service started correctly"
+          else
+            echo "❌ Service failed to start"
+            exit 1
+          fi
+
+          # Test connectivity again
+          if curl -s http://localhost:8081 > /dev/null; then
+            echo "✅ Service is responding correctly"
+          else
+            echo "❌ Service is not responding"
+            exit 1
+          fi
+
+          # Stop the service
+          brew services stop languagetool-obsidian
+
+      - name: Uninstall Formula
+        run: |
+          brew uninstall languagetool-obsidian

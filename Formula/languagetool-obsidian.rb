@@ -1,8 +1,17 @@
 class LanguagetoolObsidian < Formula
   desc "LanguageTool server optimized for Obsidian integration"
   homepage "https://github.com/mrlesmithjr/homebrew-languagetool"
-  url "https://languagetool.org/download/LanguageTool-6.6.zip"
-  sha256 "53600506b399bb5ffe1e4c8dec794fd378212f14aaf38ccef9b6f89314d11631"
+  
+  if build.with? "snapshot"
+    url "https://internal1.languagetool.org/snapshots/LanguageTool-latest-snapshot.zip"
+    sha256 :no_check
+    version "latest-snapshot"
+  else
+    url "https://languagetool.org/download/LanguageTool-6.6.zip"
+    sha256 "53600506b399bb5ffe1e4c8dec794fd378212f14aaf38ccef9b6f89314d11631"
+    version "6.6"
+  end
+  
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -14,21 +23,9 @@ class LanguagetoolObsidian < Formula
 
   depends_on "openjdk@17"
 
-  resource "snapshot" do
-    url "https://internal1.languagetool.org/snapshots/LanguageTool-latest-snapshot.zip"
-    # SHA changes frequently for snapshots, so we don't specify it
-    sha256 :no_check
-  end
-
   def install
-    if build.with? "snapshot"
-      resource("snapshot").stage do
-        libexec.install Dir["*"]
-      end
-    else
-      libexec.install Dir["*"]
-    end
-
+    libexec.install Dir["*"]
+    
     # Create bin directory
     (bin/"languagetool-obsidian-server").write <<~EOS
       #!/bin/bash
